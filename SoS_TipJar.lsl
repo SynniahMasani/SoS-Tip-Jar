@@ -641,16 +641,18 @@ announceAllTimeRecord(string name, integer amount)
 // --- TOP 10 ------------------------------------------------------
 updateTop10(key tipper, string tipperName, integer amount)
 {
-    integer found   = -1;
+    integer found;
     integer i;
     integer len;
     integer newTotal;
-    integer changed = TRUE;
+    integer changed;
     integer a;
     integer b;
     list    tmp;
 
-    len = llGetListLength(g_top10);
+    found   = -1;
+    changed = TRUE;
+    len     = llGetListLength(g_top10);
 
     for (i = 0; i < len; i += TOP_STRIDE)
     {
