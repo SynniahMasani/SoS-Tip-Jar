@@ -218,9 +218,10 @@ updateVisualFeedback()
     }
     else if (g_visualMode == "PARTICLES")
     {
-        float intensity = (float)g_sessionTipCount * 0.05;
+        float   intensity  = (float)g_sessionTipCount * 0.05;
+        integer burstCount;
         if (intensity > 1.0) intensity = 1.0;
-        integer burstCount = 2 + (integer)(intensity * 8.0);
+        burstCount = 2 + (integer)(intensity * 8.0);
         llParticleSystem([
             PSYS_SRC_PATTERN,          PSYS_SRC_PATTERN_ANGLE_CONE,
             PSYS_PART_START_COLOR,     <1.0, 0.85, 0.2>,
@@ -634,9 +635,12 @@ announceAllTimeRecord(string name, integer amount)
 // ─── TOP 10 ──────────────────────────────────────────────────────
 updateTop10(key tipper, string tipperName, integer amount)
 {
-    integer found = -1;
+    integer found   = -1;
     integer i;
-    integer len = llGetListLength(g_top10);
+    integer len     = llGetListLength(g_top10);
+    integer newTotal;
+    integer changed = TRUE;
+
     for (i = 0; i < len; i += TOP_STRIDE)
     {
         if (llList2Key(g_top10, i) == tipper)
@@ -646,7 +650,6 @@ updateTop10(key tipper, string tipperName, integer amount)
         }
     }
 
-    integer newTotal;
     if (found >= 0)
     {
         newTotal = llList2Integer(g_top10, found + 2) + amount;
@@ -659,7 +662,6 @@ updateTop10(key tipper, string tipperName, integer amount)
         g_top10 += [tipper, tipperName, newTotal];
     }
 
-    integer changed = TRUE;
     len = llGetListLength(g_top10);
     while (changed)
     {
@@ -1303,11 +1305,22 @@ default
     // ── MONEY ────────────────────────────────────────────────────
     money(key tipper, integer amount)
     {
-        // Anti-spam: ignore if this avatar tipped within SPAM_COOLDOWN seconds
-        float now = llGetTime();
-        integer spamIdx = -1;
+        float   now;
+        integer spamIdx;
         integer si;
-        integer slen = llGetListLength(g_spamList);
+        integer slen;
+        string  tipperName;
+        integer found;
+        integer i;
+        integer tlen;
+        integer isReturn;
+        integer tipperSessionTotal;
+        integer newRecord;
+
+        // Anti-spam: ignore if this avatar tipped within SPAM_COOLDOWN seconds
+        now     = llGetTime();
+        spamIdx = -1;
+        slen    = llGetListLength(g_spamList);
         for (si = 0; si < slen; si += 2)
         {
             if (llList2Key(g_spamList, si) == tipper)
@@ -1327,12 +1340,11 @@ default
         else
         {
             g_spamList += [tipper, now];
-            // Trim spam list to last 30 entries to cap memory
             if (llGetListLength(g_spamList) > 60)
                 g_spamList = llList2List(g_spamList, 2, -1);
         }
 
-        string tipperName = llGetDisplayName(tipper);
+        tipperName = llGetDisplayName(tipper);
 
         g_sessionTotal    += amount;
         g_sessionTipCount += 1;
@@ -1342,9 +1354,8 @@ default
             g_dancerSessionTotal += amount;
 
         // Track session total per tipper, detect returning tippers
-        integer found = -1;
-        integer i;
-        integer tlen = llGetListLength(g_sessionTippers);
+        found = -1;
+        tlen  = llGetListLength(g_sessionTippers);
         for (i = 0; i < tlen; i += 2)
         {
             if (llList2Key(g_sessionTippers, i) == tipper)
@@ -1354,20 +1365,18 @@ default
             }
         }
 
-        integer isReturn;
-        integer tipperSessionTotal;
         if (found >= 0)
         {
-            isReturn = TRUE;
+            isReturn           = TRUE;
             tipperSessionTotal = llList2Integer(g_sessionTippers, found + 1) + amount;
-            g_sessionTippers = llListReplaceList(g_sessionTippers,
+            g_sessionTippers   = llListReplaceList(g_sessionTippers,
                 [tipper, tipperSessionTotal], found, found + 1);
         }
         else
         {
-            isReturn = FALSE;
+            isReturn           = FALSE;
             tipperSessionTotal = amount;
-            g_sessionTippers += [tipper, tipperSessionTotal];
+            g_sessionTippers  += [tipper, tipperSessionTotal];
         }
 
         if (g_sessionTopKey == NULL_KEY || tipperSessionTotal > g_sessionTopTotal)
@@ -1381,7 +1390,7 @@ default
             g_sessionTopSingle = amount;
 
         // All-time biggest single tip record
-        integer newRecord = FALSE;
+        newRecord = FALSE;
         if (amount > g_allTimeTopTip)
         {
             g_allTimeTopTip  = amount;
