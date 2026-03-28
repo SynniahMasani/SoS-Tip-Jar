@@ -202,6 +202,8 @@ updateFillPrim()
 
 updateVisualFeedback()
 {
+    float   intensity;
+    integer burstCount;
     if (g_visualMode == "FILL")
     {
         updateFillPrim();
@@ -219,8 +221,7 @@ updateVisualFeedback()
     }
     else if (g_visualMode == "PARTICLES")
     {
-        float   intensity  = (float)g_sessionTipCount * 0.05;
-        integer burstCount;
+        intensity  = (float)g_sessionTipCount * 0.05;
         if (intensity > 1.0) intensity = 1.0;
         burstCount = 2 + (integer)(intensity * 8.0);
         llParticleSystem([
@@ -1333,6 +1334,8 @@ default
         integer isReturn;
         integer tipperSessionTotal;
         integer newRecord;
+        integer splitAmt;
+        float   lastTime;
 
         // Anti-spam: ignore if this avatar tipped within SPAM_COOLDOWN seconds
         now     = llGetTime();
@@ -1348,7 +1351,7 @@ default
         }
         if (spamIdx >= 0)
         {
-            float lastTime = llList2Float(g_spamList, spamIdx + 1);
+            lastTime = llList2Float(g_spamList, spamIdx + 1);
             if ((now - lastTime) < SPAM_COOLDOWN)
                 return;
             g_spamList = llListReplaceList(g_spamList,
@@ -1434,8 +1437,8 @@ default
 
         if (g_splitEnabled && g_splitPartnerKey != NULL_KEY && g_hasDebitPerms)
         {
-            integer splitAmt = (integer)((float)amount *
-                               (float)g_splitPercent / 100.0);
+            splitAmt = (integer)((float)amount *
+                       (float)g_splitPercent / 100.0);
             if (splitAmt > 0)
                 llGiveMoney(g_splitPartnerKey, splitAmt);
         }
@@ -1446,6 +1449,15 @@ default
     // -- LISTEN ---------------------------------------------------
     listen(integer channel, string name, key id, string msg)
     {
+        integer i;
+        integer tlen;
+        key     av;
+        string  shortName;
+        string  vipMsg;
+        key     testKey;
+        integer pct;
+        string  report;
+        integer newGoal;
         // Owner chat commands on channel 0
         if (channel == 0 && id == g_ownerKey)
         {
@@ -1468,10 +1480,6 @@ default
         // Custom TY message - pick tipper
         else if (channel == DCHAN_TYMSG_PICK)
         {
-            integer i;
-            integer tlen;
-            key     av;
-            string  shortName;
             if (g_listenTyPick) { llListenRemove(g_listenTyPick); g_listenTyPick = 0; }
             llSetTimerEvent(0.0);
             if (msg == "Cancel") return;
@@ -1525,8 +1533,8 @@ default
                     llOwnerSay("SoS: no VIP yet this session.");
                 else
                 {
-                    string vipMsg = "* VIP OF THE NIGHT: " + g_sessionTopName +
-                                    " with L$" + (string)g_sessionTopTotal + "! *";
+                    vipMsg = "* VIP OF THE NIGHT: " + g_sessionTopName +
+                             " with L$" + (string)g_sessionTopTotal + "! *";
                     llSay(0, vipMsg);
                     displayVIPBadge();
                 }
@@ -1663,7 +1671,6 @@ default
         // Split - UUID text box
         else if (channel == DCHAN_SPLIT_KEY)
         {
-            key testKey;
             if (g_listenSplitKey) { llListenRemove(g_listenSplitKey); g_listenSplitKey = 0; }
             llSetTimerEvent(0.0);
 
@@ -1692,7 +1699,6 @@ default
         // Split - percent text box
         else if (channel == DCHAN_SPLIT_PCT)
         {
-            integer pct;
             if (g_listenSplitPct) { llListenRemove(g_listenSplitPct); g_listenSplitPct = 0; }
             llSetTimerEvent(0.0);
 
@@ -1725,7 +1731,6 @@ default
         // Top 10 menu
         else if (channel == DCHAN_TOP10)
         {
-            string report;
             if (g_listenTop10) { llListenRemove(g_listenTop10); g_listenTop10 = 0; }
             llSetTimerEvent(0.0);
 
@@ -1741,7 +1746,6 @@ default
         // Goal text box
         else if (channel == DCHAN_GOAL)
         {
-            integer newGoal;
             if (g_listenGoal) { llListenRemove(g_listenGoal); g_listenGoal = 0; }
             llSetTimerEvent(0.0);
 
@@ -1843,7 +1847,6 @@ default
         // Club split % text box
         else if (channel == DCHAN_CLUB_PCT)
         {
-            integer pct;
             if (g_listenClubPct) { llListenRemove(g_listenClubPct); g_listenClubPct = 0; }
             llSetTimerEvent(0.0);
 
