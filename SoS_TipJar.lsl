@@ -481,7 +481,7 @@ showTyMsgMenu()
     for (i = 0; i < maxIdx; i += TOP_STRIDE)
     {
         key av = llList2Key(g_top10, i);
-        string shortName = llGetSubString(llKey2Name(av), 0, 10);
+        string shortName = llGetSubString(llGetDisplayName(av), 0, 10);
         buttons += shortName;
     }
     buttons += "Cancel";
@@ -761,7 +761,7 @@ showSplitMenu()
     string splitStatus;
     if (g_splitEnabled && g_splitPartnerKey != NULL_KEY)
     {
-        splitStatus = "ON - " + llKey2Name(g_splitPartnerKey) +
+        splitStatus = "ON - " + llGetDisplayName(g_splitPartnerKey) +
                       " gets " + (string)g_splitPercent + "%";
     }
     else
@@ -871,7 +871,7 @@ showLovenseMenu()
     else             lvStatus = "OFF";
     string target;
     if (g_lovenseTarget != NULL_KEY)
-        target = llKey2Name(g_lovenseTarget);
+        target = llGetDisplayName(g_lovenseTarget);
     else
         target = "None";
 
@@ -943,7 +943,7 @@ dancerClockIn(key dancer)
 {
     g_lovenseTarget      = dancer;
     g_activeDancerKey    = dancer;
-    g_activeDancerName   = llKey2Name(dancer);
+    g_activeDancerName   = llGetDisplayName(dancer);
     g_dancerSessionTotal = 0;
 
     g_splitEnabled    = TRUE;
@@ -1107,7 +1107,7 @@ handleOwnerCommand(string raw)
             setInt(K_SPLIT_ENABLED, TRUE);
             setKey(K_SPLIT_PARTNER, partner);
             setInt(K_SPLIT_PERCENT, pct);
-            llOwnerSay("SoS: split enabled. " + llKey2Name(partner) +
+            llOwnerSay("SoS: split enabled. " + llGetDisplayName(partner) +
                        " gets " + (string)pct + "%.");
             if (!g_hasDebitPerms)
                 llRequestPermissions(g_ownerKey, PERMISSION_DEBIT);
@@ -1133,7 +1133,7 @@ default
     state_entry()
     {
         g_ownerKey  = llGetOwner();
-        g_ownerName = llKey2Name(g_ownerKey);
+        g_ownerName = llGetDisplayName(g_ownerKey);
         loadState();
         llListen(0, "", g_ownerKey, "");
         llRequestPermissions(g_ownerKey, PERMISSION_DEBIT);
@@ -1196,7 +1196,7 @@ default
     // ── MONEY ────────────────────────────────────────────────────
     money(key tipper, integer amount)
     {
-        string tipperName = llKey2Name(tipper);
+        string tipperName = llGetDisplayName(tipper);
 
         g_sessionTotal    += amount;
         g_sessionTipCount += 1;
@@ -1300,14 +1300,14 @@ default
             for (i = 0; i < tlen; i += TOP_STRIDE)
             {
                 key av = llList2Key(g_top10, i);
-                string shortName = llGetSubString(llKey2Name(av), 0, 10);
+                string shortName = llGetSubString(llGetDisplayName(av), 0, 10);
                 if (shortName == msg)
                 {
                     g_pendingTyKey = av;
                     if (g_listenTyText) llListenRemove(g_listenTyText);
                     g_listenTyText = llListen(DCHAN_TYMSG_TEXT, "", g_ownerKey, "");
                     llTextBox(g_ownerKey,
-                        "Type a custom TY message for " + llKey2Name(av) + ".\n\n" +
+                        "Type a custom TY message for " + llGetDisplayName(av) + ".\n\n" +
                         "Use {name} for their name and {amount} for tip amount.\n\n" +
                         "Example: Hey {name}! L${amount} means everything, thanks!",
                         DCHAN_TYMSG_TEXT);
@@ -1326,7 +1326,7 @@ default
             if (g_pendingTyKey == NULL_KEY) return;
             llLinksetDataWrite(keyTyMsg(g_pendingTyKey), msg);
             llOwnerSay("SoS: custom TY message saved for " +
-                       llKey2Name(g_pendingTyKey) + ".");
+                       llGetDisplayName(g_pendingTyKey) + ".");
             g_pendingTyKey = NULL_KEY;
         }
 
@@ -1499,7 +1499,7 @@ default
             g_listenSplitPct = llListen(DCHAN_SPLIT_PCT, "", g_ownerKey, "");
             llTextBox(g_ownerKey,
                 "=== ENABLE SPLIT - Step 2 of 2 ===\n\n" +
-                "Partner: " + llKey2Name((key)g_pendingSplitKey) + "\n\n" +
+                "Partner: " + llGetDisplayName((key)g_pendingSplitKey) + "\n\n" +
                 "Enter the percentage of each tip\n" +
                 "to send them (1 to 100).\n\n" +
                 "Example: type 30 to send 30%\n" +
@@ -1528,7 +1528,7 @@ default
             setInt(K_SPLIT_PERCENT, g_splitPercent);
 
             llOwnerSay("SoS: split enabled! " +
-                       llKey2Name(g_splitPartnerKey) +
+                       llGetDisplayName(g_splitPartnerKey) +
                        " will receive " + (string)g_splitPercent + "% of each tip.");
 
             if (!g_hasDebitPerms)
@@ -1706,7 +1706,7 @@ default
                     g_vibeStopTime = llGetTime() + 3.0;
                     llSetTimerEvent(3.5);
                     llOwnerSay("SoS Lovense: test buzz sent to " +
-                               llKey2Name(g_lovenseTarget) + ".");
+                               llGetDisplayName(g_lovenseTarget) + ".");
                 }
                 showLovenseMenu();
             }
@@ -1723,7 +1723,7 @@ default
                     g_vibeStopTime = llGetTime() + 5.0;
                     llSetTimerEvent(5.5);
                     llOwnerSay("SoS Lovense: wave pattern sent to " +
-                               llKey2Name(g_lovenseTarget) + ".");
+                               llGetDisplayName(g_lovenseTarget) + ".");
                 }
                 showLovenseMenu();
             }
@@ -1740,7 +1740,7 @@ default
                     g_vibeStopTime = llGetTime() + 5.0;
                     llSetTimerEvent(5.5);
                     llOwnerSay("SoS Lovense: fireworks pattern sent to " +
-                               llKey2Name(g_lovenseTarget) + ".");
+                               llGetDisplayName(g_lovenseTarget) + ".");
                 }
                 showLovenseMenu();
             }
