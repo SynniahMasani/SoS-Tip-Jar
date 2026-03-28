@@ -458,7 +458,9 @@ default
         g_ownerName = llGetDisplayName(g_ownerKey);
         loadState();
         llListen(0, "", g_ownerKey, "");
-        llRequestPermissions(g_ownerKey, PERMISSION_DEBIT);
+        // Request debit only if split or club mode was already enabled
+        if (g_splitEnabled || g_clubMode)
+            llRequestPermissions(g_ownerKey, PERMISSION_DEBIT);
         llMessageLinked(LINK_SET, LM_UPDATE_HT, "", NULL_KEY);
         llOwnerSay("SoS Tip Jar v" + VERSION + " ready. Touch to open menu.");
     }
