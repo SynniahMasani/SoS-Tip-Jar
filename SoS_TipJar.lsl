@@ -136,22 +136,22 @@ integer g_listenLovense     = 0;
 integer g_listenLovenseVibe = 0;
 
 // --- LINKSET DATA HELPERS ----------------------------------------
-void setInt(string k, integer v)
+setInt(string k, integer v)
 {
     llLinksetDataWrite(k, (string)v);
 }
 
-void setStr(string k, string v)
+setStr(string k, string v)
 {
     llLinksetDataWrite(k, v);
 }
 
-void setKey(string k, key v)
+setKey(string k, key v)
 {
     llLinksetDataWrite(k, (string)v);
 }
 
-void setFloat(string k, float v)
+setFloat(string k, float v)
 {
     llLinksetDataWrite(k, (string)v);
 }
@@ -191,7 +191,7 @@ float getFillPercent()
     return pct;
 }
 
-void updateFillPrim()
+updateFillPrim()
 {
     float pct = getFillPercent();
     float sz  = 0.01 + pct * 0.98;
@@ -200,7 +200,7 @@ void updateFillPrim()
     ]);
 }
 
-void updateVisualFeedback()
+updateVisualFeedback()
 {
     float   intensity;
     integer burstCount;
@@ -242,7 +242,7 @@ void updateVisualFeedback()
     }
 }
 
-void displayVIPBadge()
+displayVIPBadge()
 {
     string badge;
     if (g_sessionTopKey == NULL_KEY) return;
@@ -255,7 +255,7 @@ void displayVIPBadge()
     ]);
 }
 
-void updateHoverText()
+updateHoverText()
 {
     string  line1 = "SoS Tip Jar";
     string  line2 = "Session: L$" + (string)g_sessionTotal;
@@ -288,7 +288,7 @@ void updateHoverText()
 }
 
 // --- PARTICLES ---------------------------------------------------
-void playSmallParticles()
+playSmallParticles()
 {
     if (!g_particlesOn) return;
 
@@ -370,7 +370,7 @@ void playSmallParticles()
     }
 }
 
-void playBigParticles()
+playBigParticles()
 {
     if (!g_particlesOn) return;
 
@@ -475,7 +475,7 @@ string getModeReturnTemplate()
     return "Welcome back, {name}! Another L${amount}  -  you are amazing!";
 }
 
-void sayThankYou(key tipper, string tipperName, integer amount, integer isReturn)
+sayThankYou(key tipper, string tipperName, integer amount, integer isReturn)
 {
     string customMsg = llLinksetDataRead(keyTyMsg(tipper));
     string tmpl;
@@ -498,7 +498,7 @@ void sayThankYou(key tipper, string tipperName, integer amount, integer isReturn
         llRegionSayTo(tipper, 0, msg);
 }
 
-void showTyMsgMenu()
+showTyMsgMenu()
 {
     list    buttons = [];
     integer i;
@@ -532,7 +532,7 @@ void showTyMsgMenu()
 }
 
 // --- MILESTONES / ANNOUNCE ---------------------------------------
-void announceMilestone(integer amount, string name)
+announceMilestone(integer amount, string name)
 {
     string msg = "";
     if (!g_publicMessages) return;
@@ -619,7 +619,7 @@ void announceMilestone(integer amount, string name)
         llSay(0, msg);
 }
 
-void announceVIP()
+announceVIP()
 {
     string msg;
     if (g_sessionTopKey == NULL_KEY) return;
@@ -632,14 +632,14 @@ void announceVIP()
     displayVIPBadge();
 }
 
-void announceAllTimeRecord(string name, integer amount)
+announceAllTimeRecord(string name, integer amount)
 {
     if (!g_publicMessages) return;
     llSay(0, "NEW ALL-TIME RECORD! " + name + " with L$" + (string)amount + "!");
 }
 
 // --- TOP 10 ------------------------------------------------------
-void updateTop10(key tipper, string tipperName, integer amount)
+updateTop10(key tipper, string tipperName, integer amount)
 {
     integer found   = -1;
     integer i;
@@ -714,7 +714,7 @@ string getTop10Report()
 }
 
 // --- STATE SAVE / LOAD -------------------------------------------
-void saveState()
+saveState()
 {
     setStr(K_MODE,            g_mode);
     setInt(K_GOAL_AMOUNT,     g_goalAmount);
@@ -736,7 +736,7 @@ void saveState()
     llLinksetDataWrite(K_TOP10, llList2CSV(g_top10));
 }
 
-void loadState()
+loadState()
 {
     string m       = getStr(K_MODE);
     string vm      = getStr(K_VISUAL_MODE);
@@ -776,7 +776,7 @@ void loadState()
 }
 
 // --- CLOSE ALL MENUS ---------------------------------------------
-void closeAllMenus()
+closeAllMenus()
 {
     if (g_listenMain)       { llListenRemove(g_listenMain);       g_listenMain       = 0; }
     if (g_listenMode)       { llListenRemove(g_listenMode);       g_listenMode       = 0; }
@@ -796,7 +796,7 @@ void closeAllMenus()
 }
 
 // --- MAIN MENU ---------------------------------------------------
-void showMainMenu()
+showMainMenu()
 {
     string status;
     closeAllMenus();
@@ -819,7 +819,7 @@ void showMainMenu()
 }
 
 // --- MODE MENU ---------------------------------------------------
-void showModeMenu()
+showModeMenu()
 {
     closeAllMenus();
     g_listenMode = llListen(DCHAN_MODE, "", g_ownerKey, "");
@@ -836,7 +836,7 @@ void showModeMenu()
 }
 
 // --- VISUAL MENU -------------------------------------------------
-void showVisualMenu()
+showVisualMenu()
 {
     closeAllMenus();
     g_listenVisual = llListen(DCHAN_VISUAL, "", g_ownerKey, "");
@@ -852,7 +852,7 @@ void showVisualMenu()
 }
 
 // --- SETTINGS MENU -----------------------------------------------
-void showSettingsMenu()
+showSettingsMenu()
 {
     string partBtn;
     string sndBtn;
@@ -875,7 +875,7 @@ void showSettingsMenu()
 }
 
 // --- SPLIT MENU --------------------------------------------------
-void showSplitMenu()
+showSplitMenu()
 {
     string splitStatus;
     closeAllMenus();
@@ -902,7 +902,7 @@ void showSplitMenu()
 }
 
 // --- TOP 10 MENU -------------------------------------------------
-void showTop10Menu()
+showTop10Menu()
 {
     closeAllMenus();
     g_listenTop10 = llListen(DCHAN_TOP10, "", g_ownerKey, "");
@@ -916,7 +916,7 @@ void showTop10Menu()
 }
 
 // --- GOAL MENU ---------------------------------------------------
-void showGoalMenu()
+showGoalMenu()
 {
     string current;
     closeAllMenus();
@@ -936,7 +936,7 @@ void showGoalMenu()
 }
 
 // --- RESET CONFIRM -----------------------------------------------
-void showResetConfirm()
+showResetConfirm()
 {
     closeAllMenus();
     g_listenReset = llListen(DCHAN_RESET, "", g_ownerKey, "");
@@ -953,7 +953,7 @@ void showResetConfirm()
 }
 
 // --- CLUB MENU ---------------------------------------------------
-void showClubMenu()
+showClubMenu()
 {
     string status;
     closeAllMenus();
@@ -983,7 +983,7 @@ void showClubMenu()
 }
 
 // --- LOVENSE MENU ------------------------------------------------
-void showLovenseMenu()
+showLovenseMenu()
 {
     string lvStatus;
     string target;
@@ -1011,14 +1011,14 @@ void showLovenseMenu()
 }
 
 // --- LOVENSE FUNCTIONS -------------------------------------------
-void lbSend(string cmd)
+lbSend(string cmd)
 {
     if (g_lovenseTarget == NULL_KEY) return;
     llRegionSayTo(g_lovenseTarget, LB_CHAN,
         (string)g_lovenseTarget + "|" + cmd);
 }
 
-void lbStop()
+lbStop()
 {
     if (g_lovenseTarget == NULL_KEY) return;
     llRegionSayTo(g_lovenseTarget, LB_CHAN,
@@ -1027,7 +1027,7 @@ void lbStop()
     g_vibeStopTime = 0.0;
 }
 
-void lbTipTrigger(integer amount)
+lbTipTrigger(integer amount)
 {
     string cmd;
     float  duration;
@@ -1058,7 +1058,7 @@ void lbTipTrigger(integer amount)
 }
 
 // --- CLUB MODE FUNCTIONS -----------------------------------------
-void dancerClockIn(key dancer)
+dancerClockIn(key dancer)
 {
     g_lovenseTarget      = dancer;
     g_activeDancerKey    = dancer;
@@ -1087,7 +1087,7 @@ void dancerClockIn(key dancer)
         llRequestPermissions(g_ownerKey, PERMISSION_DEBIT);
 }
 
-void dancerClockOut(key dancer)
+dancerClockOut(key dancer)
 {
     if (dancer != g_activeDancerKey) return;
 
@@ -1118,7 +1118,7 @@ void dancerClockOut(key dancer)
 }
 
 // --- OWNER CHAT COMMANDS -----------------------------------------
-void handleOwnerCommand(string raw)
+handleOwnerCommand(string raw)
 {
     list   parts = llParseString2List(llToLower(raw), [" "], []);
     string cmd;
