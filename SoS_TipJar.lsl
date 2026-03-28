@@ -1,20 +1,20 @@
 // SoS Tip Jar v1.2
-// Synner or Saynt — Second Life tip jar script
+// Synner or Saynt - Second Life tip jar script
 
-// ─── VERSION ─────────────────────────────────────────────────────
+// --- VERSION -----------------------------------------------------
 string VERSION = "1.2";
 
-// ─── PERSONALITY MODE CONSTANTS ──────────────────────────────────
+// --- PERSONALITY MODE CONSTANTS ----------------------------------
 string MODE_RNB      = "RNB";
 string MODE_STANDARD = "STANDARD";
 string MODE_HYPE     = "HYPE";
 string MODE_TRAP     = "TRAP";
 
-// ─── TOP 10 LIST STRIDE ──────────────────────────────────────────
+// --- TOP 10 LIST STRIDE ------------------------------------------
 integer TOP_STRIDE = 3;
 integer TOP_MAX    = 10;
 
-// ─── LINKSET DATA KEYS ───────────────────────────────────────────
+// --- LINKSET DATA KEYS -------------------------------------------
 string K_MODE            = "mode";
 string K_GOAL_AMOUNT     = "goal_amount";
 string K_SESSION_TOTAL   = "session_total";
@@ -34,7 +34,7 @@ string K_CLUB_SPLIT_PCT  = "club_split_pct";
 string K_ALL_TIME_TOP    = "all_time_top_tip";
 string K_ALL_TIME_NAME   = "all_time_top_name";
 
-// ─── OWNER / SESSION GLOBALS ─────────────────────────────────────
+// --- OWNER / SESSION GLOBALS -------------------------------------
 key     g_ownerKey;
 string  g_ownerName;
 integer g_hasDebitPerms  = FALSE;
@@ -65,25 +65,25 @@ integer g_particlesOn    = TRUE;
 integer g_soundsOn       = TRUE;
 integer g_publicMessages = TRUE;
 
-// ─── SPLIT GLOBALS ───────────────────────────────────────────────
+// --- SPLIT GLOBALS -----------------------------------------------
 integer g_splitEnabled    = FALSE;
 key     g_splitPartnerKey = NULL_KEY;
 integer g_splitPercent    = 0;
 
-// ─── VISUAL FEEDBACK GLOBALS ─────────────────────────────────────
+// --- VISUAL FEEDBACK GLOBALS -------------------------------------
 string  g_visualMode  = "GLOW";
 float   g_currentGlow = 0.0;
 float   GLOW_MAX      = 0.25;
 float   GLOW_PER_TIP  = 0.01;
 
-// ─── CUSTOM TY MESSAGE CHANNELS ──────────────────────────────────
+// --- CUSTOM TY MESSAGE CHANNELS ----------------------------------
 integer DCHAN_TYMSG_PICK = -882001;
 integer DCHAN_TYMSG_TEXT = -882002;
 integer g_listenTyPick   = 0;
 integer g_listenTyText   = 0;
 key     g_pendingTyKey   = NULL_KEY;
 
-// ─── OWNER MENU DIALOG CHANNELS ──────────────────────────────────
+// --- OWNER MENU DIALOG CHANNELS ----------------------------------
 integer DCHAN_MAIN     = -883001;
 integer DCHAN_MODE     = -883002;
 integer DCHAN_VISUAL   = -883003;
@@ -102,14 +102,14 @@ integer g_listenTop10    = 0;
 integer g_listenGoal     = 0;
 integer g_listenReset    = 0;
 
-// ─── SPLIT DIALOG CHANNELS ───────────────────────────────────────
+// --- SPLIT DIALOG CHANNELS ---------------------------------------
 integer DCHAN_SPLIT_KEY  = -883009;
 integer DCHAN_SPLIT_PCT  = -883010;
 integer g_listenSplitKey = 0;
 integer g_listenSplitPct = 0;
 string  g_pendingSplitKey = "";
 
-// ─── CLUB MODE GLOBALS ───────────────────────────────────────────
+// --- CLUB MODE GLOBALS -------------------------------------------
 integer g_clubMode           = FALSE;
 integer g_clubSplitPct       = 50;
 key     g_activeDancerKey    = NULL_KEY;
@@ -123,7 +123,7 @@ integer g_listenClub     = 0;
 integer g_listenClubPct  = 0;
 integer g_listenClockOut = 0;
 
-// ─── LOVENSE / LOVEBRIDGE GLOBALS ────────────────────────────────
+// --- LOVENSE / LOVEBRIDGE GLOBALS --------------------------------
 integer LB_CHAN          = -4257001;
 integer g_lovenseOn      = FALSE;
 key     g_lovenseTarget  = NULL_KEY;
@@ -135,7 +135,7 @@ integer DCHAN_LOVENSE_VIBE = -884002;
 integer g_listenLovense     = 0;
 integer g_listenLovenseVibe = 0;
 
-// ─── LINKSET DATA HELPERS ────────────────────────────────────────
+// --- LINKSET DATA HELPERS ----------------------------------------
 setInt(string k, integer v)
 {
     llLinksetDataWrite(k, (string)v);
@@ -181,7 +181,7 @@ string keyTyMsg(key av)
     return "tymsg_" + (string)av;
 }
 
-// ─── FILL / VISUAL FEEDBACK ──────────────────────────────────────
+// --- FILL / VISUAL FEEDBACK --------------------------------------
 float getFillPercent()
 {
     float pct;
@@ -286,7 +286,7 @@ updateHoverText()
     llSetText(line1 + "\n" + line2 + "\n" + line3, <0.9, 0.8, 0.2>, 1.0);
 }
 
-// ─── PARTICLES ───────────────────────────────────────────────────
+// --- PARTICLES ---------------------------------------------------
 playSmallParticles()
 {
     if (!g_particlesOn) return;
@@ -451,7 +451,7 @@ playBigParticles()
     }
 }
 
-// ─── THANK YOU MESSAGES ──────────────────────────────────────────
+// --- THANK YOU MESSAGES ------------------------------------------
 string getModeTyTemplate()
 {
     if (g_mode == MODE_RNB)
@@ -530,7 +530,7 @@ showTyMsgMenu()
     llSetTimerEvent(30.0);
 }
 
-// ─── MILESTONES / ANNOUNCE ───────────────────────────────────────
+// --- MILESTONES / ANNOUNCE ---------------------------------------
 announceMilestone(integer amount, string name)
 {
     string msg = "";
@@ -637,7 +637,7 @@ announceAllTimeRecord(string name, integer amount)
     llSay(0, "NEW ALL-TIME RECORD! " + name + " with L$" + (string)amount + "!");
 }
 
-// ─── TOP 10 ──────────────────────────────────────────────────────
+// --- TOP 10 ------------------------------------------------------
 updateTop10(key tipper, string tipperName, integer amount)
 {
     integer found   = -1;
@@ -712,7 +712,7 @@ string getTop10Report()
     return report;
 }
 
-// ─── STATE SAVE / LOAD ───────────────────────────────────────────
+// --- STATE SAVE / LOAD -------------------------------------------
 saveState()
 {
     setStr(K_MODE,            g_mode);
@@ -774,7 +774,7 @@ loadState()
         g_top10 = llCSV2List(top10csv);
 }
 
-// ─── CLOSE ALL MENUS ─────────────────────────────────────────────
+// --- CLOSE ALL MENUS ---------------------------------------------
 closeAllMenus()
 {
     if (g_listenMain)       { llListenRemove(g_listenMain);       g_listenMain       = 0; }
@@ -794,7 +794,7 @@ closeAllMenus()
     if (g_listenLovenseVibe){ llListenRemove(g_listenLovenseVibe);g_listenLovenseVibe= 0; }
 }
 
-// ─── MAIN MENU ───────────────────────────────────────────────────
+// --- MAIN MENU ---------------------------------------------------
 showMainMenu()
 {
     string status;
@@ -817,7 +817,7 @@ showMainMenu()
     llSetTimerEvent(30.0);
 }
 
-// ─── MODE MENU ───────────────────────────────────────────────────
+// --- MODE MENU ---------------------------------------------------
 showModeMenu()
 {
     closeAllMenus();
@@ -834,7 +834,7 @@ showModeMenu()
     llSetTimerEvent(30.0);
 }
 
-// ─── VISUAL MENU ─────────────────────────────────────────────────
+// --- VISUAL MENU -------------------------------------------------
 showVisualMenu()
 {
     closeAllMenus();
@@ -850,7 +850,7 @@ showVisualMenu()
     llSetTimerEvent(30.0);
 }
 
-// ─── SETTINGS MENU ───────────────────────────────────────────────
+// --- SETTINGS MENU -----------------------------------------------
 showSettingsMenu()
 {
     string partBtn;
@@ -873,7 +873,7 @@ showSettingsMenu()
     llSetTimerEvent(30.0);
 }
 
-// ─── SPLIT MENU ──────────────────────────────────────────────────
+// --- SPLIT MENU --------------------------------------------------
 showSplitMenu()
 {
     string splitStatus;
@@ -900,7 +900,7 @@ showSplitMenu()
     llSetTimerEvent(60.0);
 }
 
-// ─── TOP 10 MENU ─────────────────────────────────────────────────
+// --- TOP 10 MENU -------------------------------------------------
 showTop10Menu()
 {
     closeAllMenus();
@@ -914,7 +914,7 @@ showTop10Menu()
     llSetTimerEvent(30.0);
 }
 
-// ─── GOAL MENU ───────────────────────────────────────────────────
+// --- GOAL MENU ---------------------------------------------------
 showGoalMenu()
 {
     string current;
@@ -934,7 +934,7 @@ showGoalMenu()
     llSetTimerEvent(60.0);
 }
 
-// ─── RESET CONFIRM ───────────────────────────────────────────────
+// --- RESET CONFIRM -----------------------------------------------
 showResetConfirm()
 {
     closeAllMenus();
@@ -951,7 +951,7 @@ showResetConfirm()
     llSetTimerEvent(30.0);
 }
 
-// ─── CLUB MENU ───────────────────────────────────────────────────
+// --- CLUB MENU ---------------------------------------------------
 showClubMenu()
 {
     string status;
@@ -981,7 +981,7 @@ showClubMenu()
     llSetTimerEvent(30.0);
 }
 
-// ─── LOVENSE MENU ────────────────────────────────────────────────
+// --- LOVENSE MENU ------------------------------------------------
 showLovenseMenu()
 {
     string lvStatus;
@@ -1009,7 +1009,7 @@ showLovenseMenu()
     llSetTimerEvent(30.0);
 }
 
-// ─── LOVENSE FUNCTIONS ───────────────────────────────────────────
+// --- LOVENSE FUNCTIONS -------------------------------------------
 lbSend(string cmd)
 {
     if (g_lovenseTarget == NULL_KEY) return;
@@ -1056,7 +1056,7 @@ lbTipTrigger(integer amount)
     llSetTimerEvent(duration + 0.5);
 }
 
-// ─── CLUB MODE FUNCTIONS ─────────────────────────────────────────
+// --- CLUB MODE FUNCTIONS -----------------------------------------
 dancerClockIn(key dancer)
 {
     g_lovenseTarget      = dancer;
@@ -1116,7 +1116,7 @@ dancerClockOut(key dancer)
     updateHoverText();
 }
 
-// ─── OWNER CHAT COMMANDS ─────────────────────────────────────────
+// --- OWNER CHAT COMMANDS -----------------------------------------
 handleOwnerCommand(string raw)
 {
     list   parts = llParseString2List(llToLower(raw), [" "], []);
@@ -1251,9 +1251,9 @@ handleOwnerCommand(string raw)
     }
 }
 
-// ═════════════════════════════════════════════════════════════════
+// =================================================================
 // DEFAULT STATE
-// ═════════════════════════════════════════════════════════════════
+// =================================================================
 default
 {
     state_entry()
@@ -1273,7 +1273,7 @@ default
             g_hasDebitPerms = TRUE;
     }
 
-    // ── TOUCH ────────────────────────────────────────────────────
+    // -- TOUCH ----------------------------------------------------
     touch_start(integer nd)
     {
         key toucher = llDetectedKey(0);
@@ -1319,7 +1319,7 @@ default
             "This tip jar belongs to " + g_ownerName + ".");
     }
 
-    // ── MONEY ────────────────────────────────────────────────────
+    // -- MONEY ----------------------------------------------------
     money(key tipper, integer amount)
     {
         float   now;
@@ -1443,7 +1443,7 @@ default
         lbTipTrigger(amount);
     }
 
-    // ── LISTEN ───────────────────────────────────────────────────
+    // -- LISTEN ---------------------------------------------------
     listen(integer channel, string name, key id, string msg)
     {
         // Owner chat commands on channel 0
@@ -1465,7 +1465,7 @@ default
                 dancerClockOut(id);
         }
 
-        // Custom TY message — pick tipper
+        // Custom TY message - pick tipper
         else if (channel == DCHAN_TYMSG_PICK)
         {
             integer i;
@@ -1498,7 +1498,7 @@ default
             llOwnerSay("SoS: could not find that tipper.");
         }
 
-        // Custom TY message — save text
+        // Custom TY message - save text
         else if (channel == DCHAN_TYMSG_TEXT)
         {
             if (g_listenTyText) { llListenRemove(g_listenTyText); g_listenTyText = 0; }
@@ -1660,7 +1660,7 @@ default
             }
         }
 
-        // Split — UUID text box
+        // Split - UUID text box
         else if (channel == DCHAN_SPLIT_KEY)
         {
             key testKey;
@@ -1689,7 +1689,7 @@ default
             llSetTimerEvent(120.0);
         }
 
-        // Split — percent text box
+        // Split - percent text box
         else if (channel == DCHAN_SPLIT_PCT)
         {
             integer pct;
@@ -1942,7 +1942,7 @@ default
         }
     }
 
-    // ── TIMER ────────────────────────────────────────────────────
+    // -- TIMER ----------------------------------------------------
     timer()
     {
         if (g_vibeActive && llGetTime() >= g_vibeStopTime)
