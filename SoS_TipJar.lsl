@@ -246,7 +246,7 @@ displayVIPBadge()
     string badge;
     if (g_sessionTopKey == NULL_KEY) return;
     badge =
-        "★ VIP OF THE NIGHT ★\n" +
+        "* VIP OF THE NIGHT *\n" +
         g_sessionTopName + "\n" +
         "L$" + (string)g_sessionTopTotal + " tipped tonight";
     llSetLinkPrimitiveParamsFast(LINK_ROOT, [
@@ -466,12 +466,12 @@ string getModeTyTemplate()
 string getModeReturnTemplate()
 {
     if (g_mode == MODE_RNB)
-        return "Welcome back, {name}. L${amount} more — you are too kind, love.";
+        return "Welcome back, {name}. L${amount} more  -  you are too kind, love.";
     if (g_mode == MODE_HYPE)
         return "{name} IS BACK WITH L${amount}! They can't stop, won't stop!";
     if (g_mode == MODE_TRAP)
         return "{name} came back with L${amount}. Loyalty hits different.";
-    return "Welcome back, {name}! Another L${amount} — you are amazing!";
+    return "Welcome back, {name}! Another L${amount}  -  you are amazing!";
 }
 
 sayThankYou(key tipper, string tipperName, integer amount, integer isReturn)
@@ -545,7 +545,7 @@ announceMilestone(integer amount, string name)
         else if (g_mode == MODE_TRAP)
             msg = name + " dropped L$50K. Stack so tall it touched the ceiling. Legendary.";
         else
-            msg = "★★★ L$50,000 from " + name + "! An absolutely legendary tip! ★★★";
+            msg = "*** L$50,000 from " + name + "! An absolutely legendary tip! ***";
     }
     else if (amount >= 25000)
     {
@@ -556,7 +556,7 @@ announceMilestone(integer amount, string name)
         else if (g_mode == MODE_TRAP)
             msg = name + " just slid L$25,000. No cap, that's a whole check.";
         else
-            msg = "★★★ L$25,000 from " + name + "! Absolutely incredible! ★★★";
+            msg = "*** L$25,000 from " + name + "! Absolutely incredible! ***";
     }
     else if (amount >= 10000)
     {
@@ -567,7 +567,7 @@ announceMilestone(integer amount, string name)
         else if (g_mode == MODE_TRAP)
             msg = name + " blessed the jar with L$10K. Big money moves only.";
         else
-            msg = "★★ WOW! L$10,000 from " + name + "! That is beyond generous! ★★";
+            msg = "** WOW! L$10,000 from " + name + "! That is beyond generous! **";
     }
     else if (amount >= 5000)
     {
@@ -578,7 +578,7 @@ announceMilestone(integer amount, string name)
         else if (g_mode == MODE_TRAP)
             msg = name + " just put L$5,000 in the jar. Real ones do real things.";
         else
-            msg = "★ L$5,000 from " + name + "! You are absolutely amazing! ★";
+            msg = "* L$5,000 from " + name + "! You are absolutely amazing! *";
     }
     else if (amount >= 2500)
     {
@@ -622,8 +622,8 @@ announceVIP()
 {
     string msg;
     if (g_sessionTopKey == NULL_KEY) return;
-    msg = "★ Current VIP: " + g_sessionTopName +
-                 " - L$" + (string)g_sessionTopTotal + " tipped! ★";
+    msg = "* Current VIP: " + g_sessionTopName +
+                 " - L$" + (string)g_sessionTopTotal + " tipped! *";
     if (g_publicMessages)
         llSay(0, msg);
     else
@@ -1182,8 +1182,8 @@ handleOwnerCommand(string raw)
             llOwnerSay("SoS: no VIP yet this session.");
             return;
         }
-        vipMsg = "★ VIP OF THE NIGHT: " + g_sessionTopName +
-                 " with L$" + (string)g_sessionTopTotal + " tipped! ★";
+        vipMsg = "* VIP OF THE NIGHT: " + g_sessionTopName +
+                 " with L$" + (string)g_sessionTopTotal + " tipped! *";
         llSay(0, vipMsg);
         displayVIPBadge();
     }
@@ -1525,8 +1525,8 @@ default
                     llOwnerSay("SoS: no VIP yet this session.");
                 else
                 {
-                    string vipMsg = "★ VIP OF THE NIGHT: " + g_sessionTopName +
-                                    " with L$" + (string)g_sessionTopTotal + "! ★";
+                    string vipMsg = "* VIP OF THE NIGHT: " + g_sessionTopName +
+                                    " with L$" + (string)g_sessionTopTotal + "! *";
                     llSay(0, vipMsg);
                     displayVIPBadge();
                 }
