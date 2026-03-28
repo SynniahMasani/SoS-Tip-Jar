@@ -645,13 +645,13 @@ updateTop10(key tipper, string tipperName, integer amount)
     integer i;
     integer len;
     integer newTotal;
-    integer changed;
+    integer didSwap;
     integer a;
     integer b;
     list    tmp;
 
     found   = -1;
-    changed = TRUE;
+    didSwap = TRUE;
     len     = llGetListLength(g_top10);
 
     for (i = 0; i < len; i += TOP_STRIDE)
@@ -676,9 +676,9 @@ updateTop10(key tipper, string tipperName, integer amount)
     }
 
     len = llGetListLength(g_top10);
-    while (changed)
+    while (didSwap)
     {
-        changed = FALSE;
+        didSwap = FALSE;
         for (i = 0; i < len - TOP_STRIDE; i += TOP_STRIDE)
         {
             a = llList2Integer(g_top10, i + 2);
@@ -691,7 +691,7 @@ updateTop10(key tipper, string tipperName, integer amount)
                     i, i + TOP_STRIDE - 1);
                 g_top10  = llListReplaceList(g_top10, tmp,
                     i + TOP_STRIDE, i + TOP_STRIDE * 2 - 1);
-                changed  = TRUE;
+                didSwap  = TRUE;
             }
         }
     }
