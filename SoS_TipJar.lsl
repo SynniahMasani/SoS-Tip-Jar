@@ -643,12 +643,14 @@ updateTop10(key tipper, string tipperName, integer amount)
 {
     integer found   = -1;
     integer i;
-    integer len     = llGetListLength(g_top10);
+    integer len;
     integer newTotal;
     integer changed = TRUE;
     integer a;
     integer b;
     list    tmp;
+
+    len = llGetListLength(g_top10);
 
     for (i = 0; i < len; i += TOP_STRIDE)
     {
