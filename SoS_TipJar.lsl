@@ -31,6 +31,8 @@ string K_VISUAL_MODE     = "visual_mode";
 string K_LOVENSE_ON      = "lovense_on";
 string K_CLUB_MODE       = "club_mode";
 string K_CLUB_SPLIT_PCT  = "club_split_pct";
+string K_ALL_TIME_TOP    = "all_time_top_tip";
+string K_ALL_TIME_NAME   = "all_time_top_name";
 
 // ─── OWNER / SESSION GLOBALS ─────────────────────────────────────
 key     g_ownerKey;
@@ -47,8 +49,15 @@ integer g_sessionTopTotal  = 0;
 integer g_sessionTopSingle = 0;
 
 integer g_goalAmount = 0;
-list    g_top10      = [];
+list    g_top10          = [];
 list    g_sessionTippers = [];
+
+integer g_allTimeTopTip  = 0;
+string  g_allTimeTopName = "";
+
+// Anti-spam: list of [key, float timestamp] pairs, stride 2
+list    g_spamList       = [];
+float   SPAM_COOLDOWN    = 4.0;
 
 string  g_mode = "STANDARD";
 
@@ -451,12 +460,25 @@ string getModeTyTemplate()
     return "Thanks for the L${amount}, {name}!";
 }
 
-sayThankYou(key tipper, string tipperName, integer amount)
+string getModeReturnTemplate()
+{
+    if (g_mode == MODE_RNB)
+        return "Welcome back, {name}. L${amount} more — you are too kind, love.";
+    if (g_mode == MODE_HYPE)
+        return "{name} IS BACK WITH L${amount}! They can't stop, won't stop!";
+    if (g_mode == MODE_TRAP)
+        return "{name} came back with L${amount}. Loyalty hits different.";
+    return "Welcome back, {name}! Another L${amount} — you are amazing!";
+}
+
+sayThankYou(key tipper, string tipperName, integer amount, integer isReturn)
 {
     string customMsg = llLinksetDataRead(keyTyMsg(tipper));
     string tmpl;
     if (customMsg != "")
         tmpl = customMsg;
+    else if (isReturn)
+        tmpl = getModeReturnTemplate();
     else
         tmpl = getModeTyTemplate();
 
@@ -506,10 +528,89 @@ showTyMsgMenu()
 announceMilestone(integer amount, string name)
 {
     if (!g_publicMessages) return;
-    if (amount >= 1000)
-        llSay(0, "WOW! " + name + " just tipped L$" + (string)amount + "!");
+
+    string msg = "";
+
+    if (amount >= 50000)
+    {
+        if (g_mode == MODE_RNB)
+            msg = "L$50,000... " + name + " just wrote history tonight. Pure royalty.";
+        else if (g_mode == MODE_HYPE)
+            msg = "FIFTY THOUSAND LINDENBUCKS FROM " + name + "!!! THE BUILDING IS ON FIRE!!!";
+        else if (g_mode == MODE_TRAP)
+            msg = name + " dropped L$50K. Stack so tall it touched the ceiling. Legendary.";
+        else
+            msg = "★★★ L$50,000 from " + name + "! An absolutely legendary tip! ★★★";
+    }
+    else if (amount >= 25000)
+    {
+        if (g_mode == MODE_RNB)
+            msg = name + " graced us with L$25,000. Exquisite. Simply exquisite.";
+        else if (g_mode == MODE_HYPE)
+            msg = "TWENTY FIVE K FROM " + name + "!! WE ARE NOT WORTHY!!!";
+        else if (g_mode == MODE_TRAP)
+            msg = name + " just slid L$25,000. No cap, that's a whole check.";
+        else
+            msg = "★★★ L$25,000 from " + name + "! Absolutely incredible! ★★★";
+    }
+    else if (amount >= 10000)
+    {
+        if (g_mode == MODE_RNB)
+            msg = name + " came through with L$10,000. That is love on another level.";
+        else if (g_mode == MODE_HYPE)
+            msg = "TEN THOUSAND from " + name + "!! THIS IS INSANE!! THE CROWD GOES WILD!!";
+        else if (g_mode == MODE_TRAP)
+            msg = name + " blessed the jar with L$10K. Big money moves only.";
+        else
+            msg = "★★ WOW! L$10,000 from " + name + "! That is beyond generous! ★★";
+    }
+    else if (amount >= 5000)
+    {
+        if (g_mode == MODE_RNB)
+            msg = "L$5,000 from " + name + ". That kind of generosity warms the soul.";
+        else if (g_mode == MODE_HYPE)
+            msg = "FIVE THOUSAND LINDENS from " + name + "!! SOMEBODY STOP THEM!!";
+        else if (g_mode == MODE_TRAP)
+            msg = name + " just put L$5,000 in the jar. Real ones do real things.";
+        else
+            msg = "★ L$5,000 from " + name + "! You are absolutely amazing! ★";
+    }
+    else if (amount >= 2500)
+    {
+        if (g_mode == MODE_RNB)
+            msg = name + " tipped L$2,500. Smooth and generous, just like the vibe.";
+        else if (g_mode == MODE_HYPE)
+            msg = name + " just dropped L$2,500!! We see you and we LOVE you!!";
+        else if (g_mode == MODE_TRAP)
+            msg = name + " hit it with L$2,500. Racks on racks.";
+        else
+            msg = name + " just tipped L$2,500! Unbelievably generous, thank you!";
+    }
+    else if (amount >= 1000)
+    {
+        if (g_mode == MODE_RNB)
+            msg = name + " brought L$1,000 to the floor tonight. Appreciate you.";
+        else if (g_mode == MODE_HYPE)
+            msg = name + " just hit L$1,000!! LET'S GOOO!!";
+        else if (g_mode == MODE_TRAP)
+            msg = name + " slid in with a band. L$1,000. Respect.";
+        else
+            msg = "WOW! " + name + " just tipped L$1,000! You are incredible!";
+    }
     else if (amount >= 500)
-        llSay(0, name + " tipped L$" + (string)amount + "! Amazing!");
+    {
+        if (g_mode == MODE_RNB)
+            msg = name + " tipped L$500. Classy move. Truly appreciated.";
+        else if (g_mode == MODE_HYPE)
+            msg = name + " came in with L$500! The energy is UP!!";
+        else if (g_mode == MODE_TRAP)
+            msg = name + " dropped L$500. That is how we do.";
+        else
+            msg = name + " tipped L$500! Amazing, thank you so much!";
+    }
+
+    if (msg != "")
+        llSay(0, msg);
 }
 
 announceVIP()
@@ -619,6 +720,8 @@ saveState()
     setInt(K_LOVENSE_ON,      g_lovenseOn);
     setInt(K_CLUB_MODE,       g_clubMode);
     setInt(K_CLUB_SPLIT_PCT,  g_clubSplitPct);
+    setInt(K_ALL_TIME_TOP,    g_allTimeTopTip);
+    setStr(K_ALL_TIME_NAME,   g_allTimeTopName);
     llLinksetDataWrite(K_TOP10, llList2CSV(g_top10));
 }
 
@@ -650,6 +753,10 @@ loadState()
     g_clubMode    = getInt(K_CLUB_MODE);
     g_clubSplitPct = getInt(K_CLUB_SPLIT_PCT);
     if (g_clubSplitPct == 0) g_clubSplitPct = 50;
+
+    g_allTimeTopTip  = getInt(K_ALL_TIME_TOP);
+    string atn = getStr(K_ALL_TIME_NAME);
+    if (atn != "") g_allTimeTopName = atn;
 
     string top10csv = llLinksetDataRead(K_TOP10);
     if (top10csv != "")
@@ -1196,6 +1303,35 @@ default
     // ── MONEY ────────────────────────────────────────────────────
     money(key tipper, integer amount)
     {
+        // Anti-spam: ignore if this avatar tipped within SPAM_COOLDOWN seconds
+        float now = llGetTime();
+        integer spamIdx = -1;
+        integer si;
+        integer slen = llGetListLength(g_spamList);
+        for (si = 0; si < slen; si += 2)
+        {
+            if (llList2Key(g_spamList, si) == tipper)
+            {
+                spamIdx = si;
+                si = slen;
+            }
+        }
+        if (spamIdx >= 0)
+        {
+            float lastTime = llList2Float(g_spamList, spamIdx + 1);
+            if ((now - lastTime) < SPAM_COOLDOWN)
+                return;
+            g_spamList = llListReplaceList(g_spamList,
+                [tipper, now], spamIdx, spamIdx + 1);
+        }
+        else
+        {
+            g_spamList += [tipper, now];
+            // Trim spam list to last 30 entries to cap memory
+            if (llGetListLength(g_spamList) > 60)
+                g_spamList = llList2List(g_spamList, 2, -1);
+        }
+
         string tipperName = llGetDisplayName(tipper);
 
         g_sessionTotal    += amount;
@@ -1205,28 +1341,31 @@ default
         if (g_clubMode && g_activeDancerKey != NULL_KEY)
             g_dancerSessionTotal += amount;
 
-        // Track session total for this tipper
+        // Track session total per tipper, detect returning tippers
         integer found = -1;
         integer i;
-        integer slen = llGetListLength(g_sessionTippers);
-        for (i = 0; i < slen; i += 2)
+        integer tlen = llGetListLength(g_sessionTippers);
+        for (i = 0; i < tlen; i += 2)
         {
             if (llList2Key(g_sessionTippers, i) == tipper)
             {
                 found = i;
-                i = slen;
+                i = tlen;
             }
         }
 
+        integer isReturn;
         integer tipperSessionTotal;
         if (found >= 0)
         {
+            isReturn = TRUE;
             tipperSessionTotal = llList2Integer(g_sessionTippers, found + 1) + amount;
             g_sessionTippers = llListReplaceList(g_sessionTippers,
                 [tipper, tipperSessionTotal], found, found + 1);
         }
         else
         {
+            isReturn = FALSE;
             tipperSessionTotal = amount;
             g_sessionTippers += [tipper, tipperSessionTotal];
         }
@@ -1241,11 +1380,23 @@ default
         if (amount > g_sessionTopSingle)
             g_sessionTopSingle = amount;
 
+        // All-time biggest single tip record
+        integer newRecord = FALSE;
+        if (amount > g_allTimeTopTip)
+        {
+            g_allTimeTopTip  = amount;
+            g_allTimeTopName = tipperName;
+            newRecord        = TRUE;
+        }
+
         updateTop10(tipper, tipperName, amount);
         saveState();
 
-        sayThankYou(tipper, tipperName, amount);
+        sayThankYou(tipper, tipperName, amount, isReturn);
         announceMilestone(amount, tipperName);
+
+        if (newRecord && g_publicMessages)
+            announceAllTimeRecord(tipperName, amount);
 
         if (amount >= 500)
             playBigParticles();
