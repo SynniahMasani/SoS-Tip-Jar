@@ -184,8 +184,9 @@ string keyTyMsg(key av)
 // ─── FILL / VISUAL FEEDBACK ──────────────────────────────────────
 float getFillPercent()
 {
+    float pct;
     if (g_goalAmount <= 0) return 0.0;
-    float pct = (float)g_sessionTotal / (float)g_goalAmount;
+    pct = (float)g_sessionTotal / (float)g_goalAmount;
     if (pct > 1.0) pct = 1.0;
     return pct;
 }
@@ -242,8 +243,9 @@ updateVisualFeedback()
 
 displayVIPBadge()
 {
+    string badge;
     if (g_sessionTopKey == NULL_KEY) return;
-    string badge =
+    badge =
         "★ VIP OF THE NIGHT ★\n" +
         g_sessionTopName + "\n" +
         "L$" + (string)g_sessionTopTotal + " tipped tonight";
@@ -254,15 +256,15 @@ displayVIPBadge()
 
 updateHoverText()
 {
+    string  line1 = "SoS Tip Jar";
+    string  line2 = "Session: L$" + (string)g_sessionTotal;
+    string  line3 = "";
+    integer pct;
     if (g_sessionTopKey != NULL_KEY)
     {
         displayVIPBadge();
         return;
     }
-
-    string line1 = "SoS Tip Jar";
-    string line2 = "Session: L$" + (string)g_sessionTotal;
-    string line3 = "";
 
     if (g_clubMode)
     {
@@ -273,7 +275,7 @@ updateHoverText()
     }
     else if (g_goalAmount > 0)
     {
-        integer pct = (integer)(getFillPercent() * 100.0 + 0.5);
+        pct   = (integer)(getFillPercent() * 100.0 + 0.5);
         line3 = "Goal: L$" + (string)g_goalAmount + " (" + (string)pct + "%)";
     }
     else
@@ -476,6 +478,7 @@ sayThankYou(key tipper, string tipperName, integer amount, integer isReturn)
 {
     string customMsg = llLinksetDataRead(keyTyMsg(tipper));
     string tmpl;
+    string msg;
     if (customMsg != "")
         tmpl = customMsg;
     else if (isReturn)
@@ -483,7 +486,7 @@ sayThankYou(key tipper, string tipperName, integer amount, integer isReturn)
     else
         tmpl = getModeTyTemplate();
 
-    string msg = llDumpList2String(
+    msg = llDumpList2String(
         llParseString2List(tmpl, ["{name}"], []), tipperName);
     msg = llDumpList2String(
         llParseString2List(msg, ["{amount}"], []), (string)amount);
@@ -496,16 +499,18 @@ sayThankYou(key tipper, string tipperName, integer amount, integer isReturn)
 
 showTyMsgMenu()
 {
-    if (g_listenTyPick) llListenRemove(g_listenTyPick);
-    list buttons = [];
+    list    buttons = [];
     integer i;
-    integer maxIdx = llGetListLength(g_top10);
+    integer maxIdx  = llGetListLength(g_top10);
+    key     av;
+    string  shortName;
+    if (g_listenTyPick) llListenRemove(g_listenTyPick);
     if (maxIdx > TOP_STRIDE * 9) maxIdx = TOP_STRIDE * 9;
     for (i = 0; i < maxIdx; i += TOP_STRIDE)
     {
-        key av = llList2Key(g_top10, i);
-        string shortName = llGetSubString(llGetDisplayName(av), 0, 10);
-        buttons += shortName;
+        av        = llList2Key(g_top10, i);
+        shortName = llGetSubString(llGetDisplayName(av), 0, 10);
+        buttons  += shortName;
     }
     buttons += "Cancel";
 
@@ -528,9 +533,8 @@ showTyMsgMenu()
 // ─── MILESTONES / ANNOUNCE ───────────────────────────────────────
 announceMilestone(integer amount, string name)
 {
-    if (!g_publicMessages) return;
-
     string msg = "";
+    if (!g_publicMessages) return;
 
     if (amount >= 50000)
     {
@@ -616,8 +620,9 @@ announceMilestone(integer amount, string name)
 
 announceVIP()
 {
+    string msg;
     if (g_sessionTopKey == NULL_KEY) return;
-    string msg = "★ Current VIP: " + g_sessionTopName +
+    msg = "★ Current VIP: " + g_sessionTopName +
                  " - L$" + (string)g_sessionTopTotal + " tipped! ★";
     if (g_publicMessages)
         llSay(0, msg);
@@ -640,6 +645,9 @@ updateTop10(key tipper, string tipperName, integer amount)
     integer len     = llGetListLength(g_top10);
     integer newTotal;
     integer changed = TRUE;
+    integer a;
+    integer b;
+    list    tmp;
 
     for (i = 0; i < len; i += TOP_STRIDE)
     {
@@ -668,11 +676,11 @@ updateTop10(key tipper, string tipperName, integer amount)
         changed = FALSE;
         for (i = 0; i < len - TOP_STRIDE; i += TOP_STRIDE)
         {
-            integer a = llList2Integer(g_top10, i + 2);
-            integer b = llList2Integer(g_top10, i + TOP_STRIDE + 2);
+            a = llList2Integer(g_top10, i + 2);
+            b = llList2Integer(g_top10, i + TOP_STRIDE + 2);
             if (b > a)
             {
-                list tmp = llList2List(g_top10, i, i + TOP_STRIDE - 1);
+                tmp = llList2List(g_top10, i, i + TOP_STRIDE - 1);
                 g_top10  = llListReplaceList(g_top10,
                     llList2List(g_top10, i + TOP_STRIDE, i + TOP_STRIDE * 2 - 1),
                     i, i + TOP_STRIDE - 1);
@@ -689,11 +697,11 @@ updateTop10(key tipper, string tipperName, integer amount)
 
 string getTop10Report()
 {
+    string  report = "=== SoS TOP 10 ===\n";
+    integer i;
+    integer rank   = 1;
     if (llGetListLength(g_top10) == 0)
         return "SoS: no top 10 data yet.";
-    string report = "=== SoS TOP 10 ===\n";
-    integer i;
-    integer rank = 1;
     for (i = 0; i < llGetListLength(g_top10); i += TOP_STRIDE)
     {
         report += (string)rank + ". " +
@@ -729,7 +737,10 @@ saveState()
 
 loadState()
 {
-    string m = getStr(K_MODE);
+    string m       = getStr(K_MODE);
+    string vm      = getStr(K_VISUAL_MODE);
+    string atn     = getStr(K_ALL_TIME_NAME);
+    string top10csv;
     if (m != "") g_mode = m;
 
     g_goalAmount      = getInt(K_GOAL_AMOUNT);
@@ -748,19 +759,17 @@ loadState()
     g_splitPartnerKey = getKey(K_SPLIT_PARTNER);
     g_splitPercent    = getInt(K_SPLIT_PERCENT);
 
-    string vm = getStr(K_VISUAL_MODE);
     if (vm != "") g_visualMode = vm;
 
-    g_lovenseOn   = getInt(K_LOVENSE_ON);
-    g_clubMode    = getInt(K_CLUB_MODE);
+    g_lovenseOn    = getInt(K_LOVENSE_ON);
+    g_clubMode     = getInt(K_CLUB_MODE);
     g_clubSplitPct = getInt(K_CLUB_SPLIT_PCT);
     if (g_clubSplitPct == 0) g_clubSplitPct = 50;
 
-    g_allTimeTopTip  = getInt(K_ALL_TIME_TOP);
-    string atn = getStr(K_ALL_TIME_NAME);
+    g_allTimeTopTip = getInt(K_ALL_TIME_TOP);
     if (atn != "") g_allTimeTopName = atn;
 
-    string top10csv = llLinksetDataRead(K_TOP10);
+    top10csv = llLinksetDataRead(K_TOP10);
     if (top10csv != "")
         g_top10 = llCSV2List(top10csv);
 }
@@ -788,8 +797,9 @@ closeAllMenus()
 // ─── MAIN MENU ───────────────────────────────────────────────────
 showMainMenu()
 {
+    string status;
     closeAllMenus();
-    string status = "Mode: " + g_mode + "  Visual: " + g_visualMode;
+    status = "Mode: " + g_mode + "  Visual: " + g_visualMode;
     if (g_sessionTopKey != NULL_KEY)
         status += "\nVIP: " + g_sessionTopName;
 
@@ -843,10 +853,10 @@ showVisualMenu()
 // ─── SETTINGS MENU ───────────────────────────────────────────────
 showSettingsMenu()
 {
-    closeAllMenus();
     string partBtn;
     string sndBtn;
     string pubBtn;
+    closeAllMenus();
     if (g_particlesOn)    partBtn = "Particles: ON";
     else                  partBtn = "Particles: OFF";
     if (g_soundsOn)       sndBtn  = "Sounds: ON";
@@ -866,8 +876,8 @@ showSettingsMenu()
 // ─── SPLIT MENU ──────────────────────────────────────────────────
 showSplitMenu()
 {
-    closeAllMenus();
     string splitStatus;
+    closeAllMenus();
     if (g_splitEnabled && g_splitPartnerKey != NULL_KEY)
     {
         splitStatus = "ON - " + llGetDisplayName(g_splitPartnerKey) +
@@ -907,8 +917,8 @@ showTop10Menu()
 // ─── GOAL MENU ───────────────────────────────────────────────────
 showGoalMenu()
 {
-    closeAllMenus();
     string current;
+    closeAllMenus();
     if (g_goalAmount > 0)
         current = "Current goal: L$" + (string)g_goalAmount;
     else
@@ -944,8 +954,8 @@ showResetConfirm()
 // ─── CLUB MENU ───────────────────────────────────────────────────
 showClubMenu()
 {
-    closeAllMenus();
     string status;
+    closeAllMenus();
     if (g_clubMode)
     {
         if (g_activeDancerKey != NULL_KEY)
@@ -974,11 +984,11 @@ showClubMenu()
 // ─── LOVENSE MENU ────────────────────────────────────────────────
 showLovenseMenu()
 {
-    closeAllMenus();
     string lvStatus;
+    string target;
+    closeAllMenus();
     if (g_lovenseOn) lvStatus = "ON";
     else             lvStatus = "OFF";
-    string target;
     if (g_lovenseTarget != NULL_KEY)
         target = llGetDisplayName(g_lovenseTarget);
     else
@@ -1018,12 +1028,11 @@ lbStop()
 
 lbTipTrigger(integer amount)
 {
+    string cmd;
+    float  duration;
     if (!g_lovenseOn)                return;
     if (g_lovenseTarget == NULL_KEY) return;
     if (amount < 500)                return;
-
-    string cmd;
-    float  duration;
 
     if (amount >= 5000)
     {
@@ -1110,14 +1119,22 @@ dancerClockOut(key dancer)
 // ─── OWNER CHAT COMMANDS ─────────────────────────────────────────
 handleOwnerCommand(string raw)
 {
-    list parts = llParseString2List(llToLower(raw), [" "], []);
+    list   parts = llParseString2List(llToLower(raw), [" "], []);
+    string cmd;
+    string m;
+    string report;
+    string vipMsg;
+    string v;
+    string action;
+    key    partner;
+    integer pct;
     if (llList2String(parts, 0) != "!sos") return;
 
-    string cmd = llList2String(parts, 1);
+    cmd = llList2String(parts, 1);
 
     if (cmd == "mode" && llGetListLength(parts) >= 3)
     {
-        string m = llToLower(llList2String(parts, 2));
+        m = llToLower(llList2String(parts, 2));
         if (m == "rnb")           g_mode = MODE_RNB;
         else if (m == "standard") g_mode = MODE_STANDARD;
         else if (m == "hype")     g_mode = MODE_HYPE;
@@ -1151,7 +1168,7 @@ handleOwnerCommand(string raw)
     }
     else if (cmd == "top10")
     {
-        string report = getTop10Report();
+        report = getTop10Report();
         if (llGetListLength(parts) >= 3 &&
             llToLower(llList2String(parts, 2)) == "public")
             llSay(0, report);
@@ -1165,14 +1182,14 @@ handleOwnerCommand(string raw)
             llOwnerSay("SoS: no VIP yet this session.");
             return;
         }
-        string vipMsg = "★ VIP OF THE NIGHT: " + g_sessionTopName +
-                        " with L$" + (string)g_sessionTopTotal + " tipped! ★";
+        vipMsg = "★ VIP OF THE NIGHT: " + g_sessionTopName +
+                 " with L$" + (string)g_sessionTopTotal + " tipped! ★";
         llSay(0, vipMsg);
         displayVIPBadge();
     }
     else if (cmd == "visual" && llGetListLength(parts) >= 3)
     {
-        string v = llToLower(llList2String(parts, 2));
+        v = llToLower(llList2String(parts, 2));
         if (v == "fill" || v == "glow" || v == "particles")
         {
             g_visualMode = llToUpper(v);
@@ -1198,11 +1215,11 @@ handleOwnerCommand(string raw)
     }
     else if (cmd == "split" && llGetListLength(parts) >= 3)
     {
-        string action = llList2String(parts, 2);
+        action = llList2String(parts, 2);
         if (action == "on" && llGetListLength(parts) >= 5)
         {
-            key partner = (key)llList2String(parts, 3);
-            integer pct = (integer)llList2String(parts, 4);
+            partner = (key)llList2String(parts, 3);
+            pct     = (integer)llList2String(parts, 4);
             if (partner == NULL_KEY)
             {
                 llOwnerSay("SoS: invalid UUID for split partner.");
@@ -1451,16 +1468,19 @@ default
         // Custom TY message — pick tipper
         else if (channel == DCHAN_TYMSG_PICK)
         {
+            integer i;
+            integer tlen;
+            key     av;
+            string  shortName;
             if (g_listenTyPick) { llListenRemove(g_listenTyPick); g_listenTyPick = 0; }
             llSetTimerEvent(0.0);
             if (msg == "Cancel") return;
 
-            integer i;
-            integer tlen = llGetListLength(g_top10);
+            tlen = llGetListLength(g_top10);
             for (i = 0; i < tlen; i += TOP_STRIDE)
             {
-                key av = llList2Key(g_top10, i);
-                string shortName = llGetSubString(llGetDisplayName(av), 0, 10);
+                av        = llList2Key(g_top10, i);
+                shortName = llGetSubString(llGetDisplayName(av), 0, 10);
                 if (shortName == msg)
                 {
                     g_pendingTyKey = av;
@@ -1643,10 +1663,11 @@ default
         // Split — UUID text box
         else if (channel == DCHAN_SPLIT_KEY)
         {
+            key testKey;
             if (g_listenSplitKey) { llListenRemove(g_listenSplitKey); g_listenSplitKey = 0; }
             llSetTimerEvent(0.0);
 
-            key testKey = (key)msg;
+            testKey = (key)msg;
             if (testKey == NULL_KEY || msg == "")
             {
                 llOwnerSay("SoS: that does not look like a valid UUID. Split cancelled.");
@@ -1671,10 +1692,11 @@ default
         // Split — percent text box
         else if (channel == DCHAN_SPLIT_PCT)
         {
+            integer pct;
             if (g_listenSplitPct) { llListenRemove(g_listenSplitPct); g_listenSplitPct = 0; }
             llSetTimerEvent(0.0);
 
-            integer pct = (integer)msg;
+            pct = (integer)msg;
             if (pct < 1)   pct = 1;
             if (pct > 100) pct = 100;
 
@@ -1703,10 +1725,11 @@ default
         // Top 10 menu
         else if (channel == DCHAN_TOP10)
         {
+            string report;
             if (g_listenTop10) { llListenRemove(g_listenTop10); g_listenTop10 = 0; }
             llSetTimerEvent(0.0);
 
-            string report = getTop10Report();
+            report = getTop10Report();
             if (msg == "View Private")
                 llOwnerSay(report);
             else if (msg == "Announce")
@@ -1718,10 +1741,11 @@ default
         // Goal text box
         else if (channel == DCHAN_GOAL)
         {
+            integer newGoal;
             if (g_listenGoal) { llListenRemove(g_listenGoal); g_listenGoal = 0; }
             llSetTimerEvent(0.0);
 
-            integer newGoal = (integer)msg;
+            newGoal = (integer)msg;
             if (newGoal < 0) newGoal = 0;
             g_goalAmount = newGoal;
             setInt(K_GOAL_AMOUNT, g_goalAmount);
@@ -1819,10 +1843,11 @@ default
         // Club split % text box
         else if (channel == DCHAN_CLUB_PCT)
         {
+            integer pct;
             if (g_listenClubPct) { llListenRemove(g_listenClubPct); g_listenClubPct = 0; }
             llSetTimerEvent(0.0);
 
-            integer pct = (integer)msg;
+            pct = (integer)msg;
             if (pct < 1)  pct = 1;
             if (pct > 99) pct = 99;
             g_clubSplitPct = pct;
